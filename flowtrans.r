@@ -7,11 +7,16 @@ require( corrplot )
 require( reshape2 )
 require( ggplot2 )
 require( gdata )
- 
+
+
+
+ft.csv.dir = "/data/flowtrans/csv"
  
 ft.pdf   = "pdf-20180907/"
 ft.curve = "curve-pdf-20180915/"
 ft.curve.file = "curves-for-presentation-9rat-4seq.xls"
+
+
 
 ##curves
 
@@ -222,7 +227,7 @@ ft.cp.figures.from.df = function( X,main )
 	ft.cp.fig12( X, paste0(main, "-4"), ischemic=TRUE,  TYPE=TRUE  , save=TRUE)
 }
 
-ft.cp.fig12 = function( X, main, TYPE=false, ischemic = FALSE, save = FALSE )
+ft.cp.fig12 = function( X, main, TYPE=FALSE, ischemic = FALSE, save = FALSE )
 {
 	if ( ischemic )
 	{
@@ -327,7 +332,7 @@ ft.read.files = function( pat )
 {
 	DF = data.frame()
 
-	F =dir( "xls/", pattern=pat, full.names = TRUE  )
+	F =dir( ft.csv.dir, pattern=pat, full.names = TRUE  )
 
 	for ( f in F )
 	{
