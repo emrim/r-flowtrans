@@ -13,19 +13,99 @@ require( ggpubr )
 require( stringr )
 require( readxl )
 
-ft.xls.dir = "/mnt/store0/data/flowtrans/data/"
-ft.date    = "20200516"
+ft.data.dir = "/mnt/store0/data/flowtrans/data/"
+ft.xls.dir  = "/mnt/store0/data/flowtrans/data/xls/"
+ft.date    = "20201214"
 
+ft.stat.dir = paste0( "/mnt/store0/data/flowtrans/stat-", ft.date, "/" )
+
+
+## contingency
+
+ft.cp.fig12 = function( X, main, TYPE=FALSE, ischemic = FALSE, save = FALSE )
+{
+	if ( ischemic )
+	{
+		if ( TYPE )
+		{
+			XT = table( X$ROI, X$TYPE )
+		}
+		else
+		{
+			XT = table( X$ROI, X$type )
+		}
+		
+	}
+	else
+	{
+		if ( TYPE )
+		{
+			XT = table( X$roi, X$TYPE )
+		}
+		else
+		{
+			XT = table( X$roi, X$type )
+		}
+		
+	}
+	
+	chisq = chisq.test( XT )
+
+	contrib <- 100*chisq$residuals^2/chisq$statistic
+	
+	
+	CR = chisq$residuals
+	
+	i = which( is.na(CR ))
+	if ( length(i) > 0 ) CR[i] = 0
+	
+	par(pin=c(8,8))              ##  (width, height) in inches    
+	par(omi=c(0.5,.5,0.5,0.5))        ## (bottom, left, top, right)  in inches  
+	par(xpd=TRUE)
+	corrplot(CR, tl.srt = 0, tl.cex = 1.2, is.cor = FALSE, main="\n"	,
+				tl.col = "black", tl.offset=1, mar = c(2, 0, 1, 0), cl.ratio = 0.3, cl.align = "l", cl.offset=0.5) #cl.pos = "n")
+
+# 	corrplot(contrib, tl.srt = 0, tl.cex = 1.5, is.cor = FALSE, main=""	,
+# 				tl.col = "black", tl.offset=1 mar = c(2, 0, 1, 0))
+				
+				
+				
+	if ( save )
+	{
+                dir.create( ft.pdf, showWarnings = FALSE)
+	
+		dev.copy2pdf( device=x11, file= paste0(ft.pdf, "contingency-", main, ".pdf") )
+	}
+
+	return( chisq )
+}
+
+
+
+
+
+
+## descriptiv & wilcox csv i/o
+ft.write.stat.csv = function( X, file.name.start, stat = "descr" )
+{
+	suppressWarnings( dir.create( ft.stat.dir ) )
+
+	file.name    = paste0( ft.stat.dir, file.name.start, "-", stat, ".csv")
+	file.name.hu = paste0( ft.stat.dir, file.name.start, "-", stat, "_hu.csv")
+
+	write.csv  ( X, file.name )
+	write.table( X, file.name.hu, sep=";", dec="," )
+}
 
 ft.read.csv = function( data )
 {
-	q = read.csv( paste0(ft.xls.dir, toupper(data), "-", ft.date, ".csv" ) )
+	q = read.csv( paste0(ft.data.dir, toupper(data), "-", ft.date, ".csv" ) )
 	return(q)
 }
 
 ft.write.csv = function( DF, data )
 {
-	write.csv( DF, paste0(ft.xls.dir, toupper(data), "-", ft.date, ".csv"), row.names=FALSE ) 
+	write.csv( DF, paste0(ft.data.dir, toupper(data), "-", ft.date, ".csv"), row.names=FALSE ) 
 }
 
 
@@ -99,13 +179,16 @@ ft.read.all.xls = function(data = "cbf")
 
 
 	i = which( Y$type == "IV" | Y$type == "V" )
-	Y$NSlope[i] =  X$TAmp[i] / ( X$NPC[i] - X$OTC[i] )
+		Y$NSlope[i] =  X$TAmp[i] / ( X$NPC[i] - X$OTC[i] )
 
 	i = which( Y$type == "I" )
-	Y$PSlope[i] =  X$TAmp[i] / ( X$PPC[i] - X$OTC[i] )
+		Y$PSlope[i] =  X$TAmp[i] / ( X$PPC[i] - X$OTC[i] )
 
 	i = which( Y$type == "II" | Y$type == "III" )
-	Y$PSlope[i] =  X$TAmp[i] / ( X$PPC[i] - X$NPC[i] )
+	{
+		Y$PSlope[i] =  X$PAmp[i] / ( X$PPC[i] - X$NPC[i] )
+		Y$NSlope[i] =  X$NAmp[i] / ( X$NPC[i] - X$OTC[i] )
+	}
 
 
 	return(Y)
