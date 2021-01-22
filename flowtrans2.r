@@ -15,7 +15,7 @@ require( readxl )
 
 ft.data.dir = "/mnt/store0/data/flowtrans/data/"
 ft.xls.dir  = "/mnt/store0/data/flowtrans/data/xls/"
-ft.date    = "20201214"
+ft.date    = "20201230"
 
 ft.stat.dir = paste0( "/mnt/store0/data/flowtrans/stat-", ft.date, "/" )
 
@@ -24,10 +24,12 @@ ft.stat.dir = paste0( "/mnt/store0/data/flowtrans/stat-", ft.date, "/" )
 
 ft.cp.fig12 = function( X, main, TYPE=FALSE, ischemic = FALSE, save = FALSE )
 {
+	tm = 3
 	if ( ischemic )
 	{
 		if ( TYPE )
 		{
+			tm = 3
 			XT = table( X$ROI, X$TYPE )
 		}
 		else
@@ -40,6 +42,7 @@ ft.cp.fig12 = function( X, main, TYPE=FALSE, ischemic = FALSE, save = FALSE )
 	{
 		if ( TYPE )
 		{
+			tm = 3
 			XT = table( X$roi, X$TYPE )
 		}
 		else
@@ -62,8 +65,9 @@ ft.cp.fig12 = function( X, main, TYPE=FALSE, ischemic = FALSE, save = FALSE )
 	par(pin=c(8,8))              ##  (width, height) in inches    
 	par(omi=c(0.5,.5,0.5,0.5))        ## (bottom, left, top, right)  in inches  
 	par(xpd=TRUE)
-	corrplot(CR, tl.srt = 0, tl.cex = 1.2, is.cor = FALSE, main="\n"	,
-				tl.col = "black", tl.offset=1, mar = c(2, 0, 1, 0), cl.ratio = 0.3, cl.align = "l", cl.offset=0.5) #cl.pos = "n")
+	corrplot(CR, tl.srt = 0, tl.cex = 1.2, is.cor = FALSE, main=paste( main , "\n"),
+				tl.col = "black", tl.offset=1, mar = c(2, 0, tm, 0), 
+				cl.ratio = 0.3, cl.align = "l", cl.offset=0.5) #cl.pos = "n")
 
 # 	corrplot(contrib, tl.srt = 0, tl.cex = 1.5, is.cor = FALSE, main=""	,
 # 				tl.col = "black", tl.offset=1 mar = c(2, 0, 1, 0))
