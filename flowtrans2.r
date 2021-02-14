@@ -15,9 +15,23 @@ require( readxl )
 
 ft.data.dir = "/mnt/store0/data/flowtrans/data/"
 ft.xls.dir  = "/mnt/store0/data/flowtrans/data/xls/"
-ft.date    = "20201230"
+ft.date    = "20210129"
 
 ft.stat.dir = paste0( "/mnt/store0/data/flowtrans/stat-", ft.date, "/" )
+
+## descr stat
+
+ft.descr.stat.exoprt = function(X, x)
+{
+	X$roi = factor( X$roi )
+	X$ROI = factor( X$ROI )
+	
+	cbf_ds = stby( data = X, INDICES = X$roi, FUN = descr, stats = "common")
+	ft.write.stat.csv(tb( cbf_ds ),  paste0(x,"-roi1" ) ) 	
+
+	cbf_ds = stby( data = X, INDICES = X$ROI, FUN = descr, stats = "common")
+	ft.write.stat.csv(tb( cbf_ds ),  paste0(x,"-roi2" )) 
+}
 
 
 ## contingency
@@ -132,8 +146,17 @@ ft.read.all.xls = function(data = "cbf")
 		}
 	}
 
+	# 2 sec rescaling
+	X$length = 2 * X$length
+	X$OT     = 2 * X$OT
+	X$OTC    = 2 * X$OTC
+	X$NPC    = 2 * X$NPC
+	X$PPC    = 2 * X$PPC
 
- 	Y = data.frame( id = X$id, roi = X$roi, code = X$code, type = X$type )
+ 	Y = data.frame( id = X$id, grp = "GRP1", roi = X$roi, code = X$code, type = X$type )
+	Y$grp = as.character(Y$grp) 
+	Y$grp[ which( str_detect( as.character(Y$id), "_2" ) ) ] = "GRP2"
+	Y$grp = factor( Y$grp)
 
    	Y$ROI = "ISCHEMIC"
     i = which( as.numeric( substr( X$roi,4,4)) > 6 )
@@ -141,7 +164,12 @@ ft.read.all.xls = function(data = "cbf")
 	Y$ROI  = factor( Y$ROI )
 
 
-	
+	Y$ROIrow = "Rrow1"
+    roin = as.numeric( substr( X$roi,4,4))
+	Y$ROIrow[ which( roin > 3 ) ] = "Rrow2"
+	Y$ROIrow[ which( roin > 6 ) ] = "Rrow3"
+
+
 	Y$TYPE = "I"
 	i = which( X$type == 2 | X$type == 3 )
 	if ( length(i) > 0 ) Y$TYPE[ i ] = "II&III"
@@ -174,10 +202,11 @@ ft.read.all.xls = function(data = "cbf")
     Y$NAmp = X$NAmp
     Y$PAmp = X$PAmp
     Y$TAmp = X$TAmp
-    Y$Duration = X$length
-	Y$OT   = X$OT
 	Y$baseline = X$baseline
-    Y$OTC  = X$OTC
+
+    Y$Duration = X$length
+	Y$OT       = X$OT 
+    Y$OTC      = X$OTC 
     Y$NSlope = NA # X$TAmp / ( X$NPC - X$OTC )
     Y$PSlope = NA # X$TAmp / ( X$PPC - X$OTC )
 
