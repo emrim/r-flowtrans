@@ -79,7 +79,7 @@ ft.cp.fig12 = function( X, main, TYPE=FALSE, ischemic = FALSE, save = FALSE )
 	par(pin=c(8,8))              ##  (width, height) in inches    
 	par(omi=c(0.5,.5,0.5,0.5))        ## (bottom, left, top, right)  in inches  
 	par(xpd=TRUE)
-	corrplot(CR, tl.srt = 0, tl.cex = 1.2, is.cor = FALSE, main=paste( main , "\n"),
+	corrplot(CR, tl.srt = 0, tl.cex = 1.5, is.cor = FALSE, main=paste( main , "\n"),
 				tl.col = "black", tl.offset=1, mar = c(2, 0, tm, 0), 
 				cl.ratio = 0.3, cl.align = "l", cl.offset=0.5) #cl.pos = "n")
 
