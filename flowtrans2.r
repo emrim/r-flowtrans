@@ -15,7 +15,7 @@ require( readxl )
 
 ft.data.dir = "/mnt/store0/data/flowtrans/data/"
 ft.xls.dir  = "/mnt/store0/data/flowtrans/data/xls/"
-ft.date    = "20210129"
+ft.date    = "20211031"
 
 ft.stat.dir = paste0( "/mnt/store0/data/flowtrans/stat-", ft.date, "/" )
 
@@ -26,11 +26,15 @@ ft.descr.stat.exoprt = function(X, x)
 	X$roi = factor( X$roi )
 	X$ROI = factor( X$ROI )
 	
-	cbf_ds = stby( data = X, INDICES = X$roi, FUN = descr, stats = "common")
-	ft.write.stat.csv(tb( cbf_ds ),  paste0(x,"-roi1" ) ) 	
+	cbf_ds = stby( data = X, INDICES = list(X$id, X$ROI), FUN = descr, stats = "common")
+	ft.write.stat.csv(tb( cbf_ds ),  paste0(x,"-id-roi" ), "descr" ) 	
 
-	cbf_ds = stby( data = X, INDICES = X$ROI, FUN = descr, stats = "common")
-	ft.write.stat.csv(tb( cbf_ds ),  paste0(x,"-roi2" )) 
+#	cbf_ds = stby( data = X, INDICES = X$ROI, FUN = descr, stats = "common")
+#	ft.write.stat.csv(tb( cbf_ds ),  paste0(x,"-roi2" )) 
+
+	xtb = as.data.frame( table( X$id,X$TYPE, X$ROI ) )
+	ft.write.stat.csv( xtb,  paste0(x,"-id-type-roi" ), "freq" ) 	
+
 }
 
 
@@ -104,7 +108,7 @@ ft.cp.fig12 = function( X, main, TYPE=FALSE, ischemic = FALSE, save = FALSE )
 
 
 ## descriptiv & wilcox csv i/o
-ft.write.stat.csv = function( X, file.name.start, stat = "descr" )
+ft.write.stat.csv = function( X, file.name.start, stat )
 {
 	suppressWarnings( dir.create( ft.stat.dir ) )
 
